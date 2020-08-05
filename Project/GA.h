@@ -17,11 +17,13 @@ public:
 	void GenerateInitialPopulation(int populationSize);
 	void DisplayPopulation(Shader* shader, Camera* cam);
 	void UpdatePopulation();
+	void Selection();
 	// Selection of population
-	void Crossover();
+	Component* Crossover(int index1, int index2, int arrIndex);
 	void Mutation();
 	void IncrimentDisplay(Camera* cam);
 	void RotateCurrentModel(glm::vec3 dir, float delta);
+	void AddScore(int scoreToAdd);
 private:
 	//std::vector<Cube*> m_vPopulation;
 	//std::vector<SubComponent*> m_vPopulation;

@@ -12,6 +12,18 @@ SubComponent::~SubComponent()
 
 }
 
+void SubComponent::SetColour(glm::vec3 colour)
+{
+	m_colour = colour;
+}
+
+void SubComponent::SetColour()
+{
+	m_colour.r = (rand() % 100) / 100.0f;
+	m_colour.g = (rand() % 100) / 100.0f;
+	m_colour.b = (rand() % 100) / 100.0f;
+}
+
 void SubComponent::SetTexture(const char* path)
 {
 	m_cube->LoadTexture(path);
@@ -19,9 +31,11 @@ void SubComponent::SetTexture(const char* path)
 
 void SubComponent::Set(glm::vec3 pos, glm::vec3 scale, glm::vec3 rotation)
 {
-	m_cube->SetPosition(pos);
+	//m_cube->SetPosition(pos);
 	m_cube->SetScale(scale);
 	m_cube->SetRotation(rotation);
+
+	SetLocalPosition(pos);
 }
 
 void SubComponent::Set(SubComponent* sc)
@@ -31,11 +45,22 @@ void SubComponent::Set(SubComponent* sc)
 	m_cube->SetRotation(sc->GetCube()->GetRotation());
 }
 
+void SubComponent::Draw(Shader * shader)
+{
+	shader->Use();
+
+	shader->SetVec3("colors", m_colour);		
+
+	m_cube->Draw(shader);
+}
+
 void SubComponent::CopyData(SubComponent * sc)
 {
-	m_cube->SetPosition(sc->GetCube()->GetPosition());
 	m_cube->SetScale(sc->GetCube()->GetScale());
 	m_cube->SetRotation(sc->GetCube()->GetRotation());
+
+	m_localPos = sc->m_localPos;
+	m_colour = sc->m_colour;
 }
 
 
@@ -51,6 +76,11 @@ FOUR TYPES OF MUTATION FOR CYLINDER
 - HEIGHT MODIFICATION
 - TOP AND BOTTOM RADII MODIFICATION
 */
+
+void SubComponent::SetGlobalPosition(glm::vec3 parentPos)
+{
+	m_cube->SetPosition(parentPos + m_localPos);
+}
 
 void SubComponent::Mutate()
 {

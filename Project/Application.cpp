@@ -31,8 +31,8 @@ void LoadFile();
 void DrawGA(GA* ga, Shader* shader, GLFWwindow* window);
 
 Camera* cam = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
-const unsigned int SCR_WIDTH = 900;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1500;
+const unsigned int SCR_HEIGHT = 1000;
 double lastX = SCR_WIDTH / 2.0f;
 double lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -88,13 +88,13 @@ int main()
 	Shader* colorShader = new Shader("Shaders/Color.vert", "Shaders/Color.frag");
 
 	SubComponent* sc1 = new SubComponent();
-	sc1->Set(glm::vec3(0, 0, 0), glm::vec3(0.4f, 0.05f, 0.4f), glm::vec3(1, 0, 0));
-	sc1->SetTexture("Images/Brick.jpg");
+	sc1->Set(glm::vec3(0, 0, 0), glm::vec3(0.4f, 0.05f, 0.4f), glm::vec3(1, 0, 0));		
+	sc1->SetTexture("Images/Brick2.png");
 
 	//sc1->SetTexture(shader)
 	SubComponent* sc2 = new SubComponent();
 	sc2->Set(glm::vec3(0, 0.2f, 0), glm::vec3(0.1f, 0.4f, 0.1f), glm::vec3(1, 0, 0));
-	sc2->SetTexture("Images/Brick.jpg");
+	sc2->SetTexture("Images/Brick2.png");
 
 	Component* inputComponent = new Component(0);
 	inputComponent->AddComponent(sc1);
@@ -472,7 +472,9 @@ void ProcessInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		cam->ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		ga->RotateCurrentModel(glm::vec3(0, 1, 0), deltaTime);
+		cam->ProcessKeyboard(RIGHT, deltaTime);
+
+		//ga->RotateCurrentModel(glm::vec3(0, 1, 0), deltaTime);
 
 	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
 		cube1->SetRotation(glm::vec3(1, 0, 0));
@@ -498,6 +500,8 @@ void ProcessInput(GLFWwindow* window)
 		mousePressed = false;
 	}
 
+	
+
 
 
 }
@@ -522,5 +526,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	cam->ProcessMouseScroll(yoffset);
+	// Here i will set the scores of the models
+	//cam->ProcessMouseScroll(yoffset);
+	ga->AddScore(yoffset);
 }

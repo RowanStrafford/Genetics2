@@ -69,9 +69,7 @@ void Cube::SetIndex(int index)
 void Cube::Draw(Shader* shader)
 {
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	shader->Use();
+	glBindTexture(GL_TEXTURE_2D, texture);	
 
 	glBindVertexArray(VAO);
 
