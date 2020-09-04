@@ -17,22 +17,16 @@ MyCylinder::MyCylinder(float baseRadius, float topRadius, float height, int edge
 
 	m_model = glm::translate(m_model, m_position);
 	m_model = glm::scale(m_model, m_scale);
+
 	SetupGL();
-
-	/*glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);	
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(float), &m_vertices[0], GL_STATIC_DRAW);
-	//glBufferData(GL_ARRAY_BUFFER, m_indices.size(), &m_indices[0], GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);*/
 }
 
 MyCylinder::~MyCylinder()
+{
+
+}
+
+void MyCylinder::CreateVertices()
 {
 
 }
@@ -65,35 +59,7 @@ void MyCylinder::SetupGL()
 
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(sizeof(float) * 6));
 	glEnableVertexAttribArray(2);
-
 }
-
-void MyCylinder::LoadTexture(Shader* shader)
-{
-	//Texture stuff
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("Images/Brick.jpg", &width, &height, &nrChannels, 0);
-
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-
-	stbi_image_free(data);
-
-	shader->SetInt("Texture1", 0);
-};
-
-
 
 
 void MyCylinder::CalculateUnitCircleVertices()
@@ -109,85 +75,6 @@ void MyCylinder::CalculateUnitCircleVertices()
 		m_unitVertices.push_back(sin(sectorAngle));
 		m_unitVertices.push_back(0);
 	}
-}
-
-
-
-void MyCylinder::Create()
-{
-	CalculateUnitCircleVertices();
-
-	for (int i = 0; i < 2; ++i)
-	{
-		float h = -m_height / 2.0f + i * m_height;
-		float t = 1.0f - i;
-
-		for (int j = 0, k = 0; j < m_edges - 1; ++j, k += 3)
-		{
-			float ux = m_unitVertices[k];
-			float uy = m_unitVertices[k + 1];
-			float uz = m_unitVertices[k + 2];
-
-			float ux2 = m_unitVertices[k + 3];
-			float uy2 = m_unitVertices[k + 4];
-			float uz2 = m_unitVertices[k + 5];
-
-			m_vertices.push_back(ux * m_baseRadius);
-			m_vertices.push_back(uy * m_baseRadius);
-			m_vertices.push_back(h);
-
-			m_vertices.push_back(ux2 * m_baseRadius);
-			m_vertices.push_back(uy2 * m_baseRadius);
-			m_vertices.push_back(h);
-
-			m_vertices.push_back(0);
-			m_vertices.push_back(0);
-			m_vertices.push_back(h);
-		}
-	}
-
-	int baseCenterIndex = (int)m_vertices.size() / 3;
-	int topCenterIndex = baseCenterIndex + m_edges + 1;
-
-	for (int i = 0; i < 2; ++i)
-	{
-		//float h = -m_height / 2.0f + i * m_height;
-		if (i == 1) continue;
-		float h = -m_height / 2.0f + 0 * m_height;
-		float h2 = -m_height / 2.0f + 1 * m_height;
-
-
-		float nz = -1 + i * 2;
-
-		m_vertices.push_back(0);	
-		m_vertices.push_back(0);
-		m_vertices.push_back(h);
-	
-		for (int j = 0, k = 0; j < m_edges - 1; ++j, k += 3)
-		{
-			float ux = m_unitVertices[k];
-			float uy = m_unitVertices[k + 1];
-
-			float ux2 = m_unitVertices[k + 3];
-			float uy2 = m_unitVertices[k + 4];
-
-			// position vector
-			m_vertices.push_back(ux * m_baseRadius);             // vx
-			m_vertices.push_back(uy * m_baseRadius);             // vy
-			m_vertices.push_back(h);                       // vz		
-
-			m_vertices.push_back(ux2 * m_baseRadius);             // vx
-			m_vertices.push_back(uy2 * m_baseRadius);             // vy
-			m_vertices.push_back(h);     
-			
-			m_vertices.push_back(ux * m_baseRadius);             // vx
-			m_vertices.push_back(uy * m_baseRadius);             // vy
-			m_vertices.push_back(h2);  // vz		
-		}
-	}
-
-	//GenerateTriangles(baseCenterIndex, topCenterIndex);
-	Print();
 }
 
 void MyCylinder::BuildVertices()
@@ -476,14 +363,6 @@ void MyCylinder::AddIndices(unsigned int index1, unsigned int index2, unsigned i
 	m_indices.push_back(index1);
 	m_indices.push_back(index2);
 	m_indices.push_back(index3);
-}
-
-void MyCylinder::Print()
-{
-	for (int i = 0; i < m_vertices.size() - 2; i += 3)
-	{
-		std::cout << Round(m_vertices[i] * 1000.0f) / 1000.0f << " , " << Round(m_vertices[i + 1] * 1000.0f) / 1000.0f << " , " << Round(m_vertices[i + 2] * 1000.0f) / 1000.0f << std::endl;
-	}
 }
 
 float MyCylinder::Round(float val)

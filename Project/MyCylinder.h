@@ -2,33 +2,27 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <vector>
-#include "Shader.h"
-#include "stb_image.h"
+#include "Geometry.h"
 
-// GLM - MATHS/VECTORS/MATRICES
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-class MyCylinder
+class MyCylinder : public Geometry
 {
 public:
 	MyCylinder(float baseRadius, float topRadius, float height, int edges);
 	~MyCylinder();
 
-	void SetupGL();
+	virtual void CreateVertices();
+	virtual void Draw(Shader* shader);
 
-	void LoadTexture(Shader * shader);
+	virtual void SetupGL();
+
+
 
 	void CalculateUnitCircleVertices();
-	void Create();
 	void BuildVertices();
 	std::vector<float> ComputeFaceNormal(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3);
 	void ClearArrays();
 	void GenerateTriangles(int baseCenter, int topCenter);
 
-	void Draw(Shader * shader);
 	void Update(float deltaTime);
 	void BuildInterleavedvertices();
 
@@ -49,10 +43,7 @@ public:
 	void AddTexCoords(float s, float t);
 	void AddIndices(unsigned int index1, unsigned int index2, unsigned int index3);
 
-	void Print();
 	float Round(float val);
-
-
 
 private:
 	float m_height;
@@ -60,15 +51,11 @@ private:
 	int m_stackCount = 1;
 	float m_baseRadius, m_topRadius;
 	unsigned int m_baseIndex;                 
-	unsigned int m_topIndex;     
+	unsigned int m_topIndex;    
 
-	glm::mat4 m_model;
-	glm::vec3 m_position;
-	glm::vec3 m_scale;
-	glm::vec3 m_rotation;
 	float m_rotationValue;
 
-	GLuint VBO, VAO, IBO;
+	GLuint IBO;
 
 	std::vector<float> m_vertices;	
 	std::vector<float> m_normals;
@@ -77,10 +64,6 @@ private:
 
 	std::vector<float> m_unitVertices;
 	std::vector<float> m_interleavedVertices;
-	int m_interleavedStride;    
-
-	unsigned int texture;
-
-
+	int m_interleavedStride;  
 };
 

@@ -29,6 +29,7 @@ void DrawCylinder(MyCylinder* cylinder, Shader* shader, GLFWwindow* window);
 void Draw(MyCylinder* cylinder, Cube* cube, Shader* shader, GLFWwindow* window);
 void LoadFile();
 void DrawGA(GA* ga, Shader* shader, GLFWwindow* window);
+void DrawGAInputModel(GA* ga, Shader* shader, GLFWwindow* window);
 
 Camera* cam = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 const unsigned int SCR_WIDTH = 1500;
@@ -46,10 +47,10 @@ Cube* cube1;
 int displayIndex = 0;
 
 bool mousePressed = false;
+bool simulationBegin = false;
 
 int main()
 {
-
 	//System* s = new System();
 	//s->SetCallbackFunctions();
 	//s->Update();	
@@ -87,26 +88,40 @@ int main()
 	Shader* shaderMix = new Shader("Shaders/Mix.vert", "Shaders/Mix.frag");
 	Shader* colorShader = new Shader("Shaders/Color.vert", "Shaders/Color.frag");
 
+	/*Cube* newCube = new Cube();
+	newCube->SetPosition(glm::vec3(0, 0, 0));
+	newCube->SetScale(glm::vec3(1, 1, 1));
+	newCube->SetRotation(glm::vec3(1, 0, 0));
+	newCube->LoadTexture("Images/Brick2.png");
+	newCube->UpdateModel();
+
+	DrawCube(newCube, shader1, window);
+	*/
+
 	SubComponent* sc1 = new SubComponent();
 	sc1->Set(glm::vec3(0, 0, 0), glm::vec3(0.4f, 0.05f, 0.4f), glm::vec3(1, 0, 0));		
 	sc1->SetTexture("Images/Brick2.png");
 
 	//sc1->SetTexture(shader)
 	SubComponent* sc2 = new SubComponent();
-	sc2->Set(glm::vec3(0, 0.2f, 0), glm::vec3(0.1f, 0.4f, 0.1f), glm::vec3(1, 0, 0));
+	sc2->Set(glm::vec3(0, 0.2f, 0), glm::vec3(0.05f, 0.4f, 0.05f), glm::vec3(1, 0, 0));
 	sc2->SetTexture("Images/Brick2.png");
 
+	SubComponent* sc3 = new SubComponent();
+	sc3->set
 	Component* inputComponent = new Component(0);
 	inputComponent->AddComponent(sc1);
 	inputComponent->AddComponent(sc2);
 
 	ga->SetInputModel(inputComponent);
+	DrawGAInputModel(ga, shader1, window);
 	ga->GenerateInitialPopulation(5);
+	
 
 	//std::vector<Cube*> cubes;
 
 	//MyCylinder* c = new MyCylinder(0.5f, 1.0f, 2.0f, 10);
-	//c->LoadTexture(shader2);
+//	c->LoadTexture("Images/Brick2.png");
 	//cube1 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	//cube1->LoadTexture(shader1);	
 
@@ -119,6 +134,36 @@ int main()
 
 	glfwTerminate();
 	return 0;
+}
+
+void DrawGAInputModel(GA* ga, Shader* shader, GLFWwindow* window)
+{
+	while (!glfwWindowShouldClose(window)) 
+	{
+		if (simulationBegin) return;
+
+		glClearColor(0.78f, 0.78f, 0.78f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		double currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		ProcessInput(window);
+
+		shader->Use();
+
+		glm::mat4 projection = glm::perspective(glm::radians(cam->m_zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		shader->SetMatrix("projection", projection);
+
+		glm::mat4 view = cam->GetViewMatrix();
+		shader->SetMatrix("view", view);
+
+		ga->DisplayInputModel(shader, cam);
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
 }
 
 void DrawGA(GA* ga, Shader* shader, GLFWwindow* window)
@@ -239,7 +284,7 @@ void DrawCylinder(MyCylinder* cylinder, Shader* shader, GLFWwindow* window)
 {
 	while (!glfwWindowShouldClose(window))
 	{
-		glViewport(SCR_WIDTH / 3, 0, (SCR_WIDTH / 3) * 2, SCR_HEIGHT);
+		//glViewport(SCR_WIDTH / 3, 0, (SCR_WIDTH / 3) * 2, SCR_HEIGHT);
 
 		glClearColor(0.78f, 0.78f, 0.78f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -488,6 +533,10 @@ void ProcessInput(GLFWwindow* window)
 		cube1->SetRotation(glm::vec3(0, 0, 1));
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		cube1->SetRotation(glm::vec3(0, 0, -1));
+
+	// Start Simulation
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		simulationBegin = true;
 
 	if (glfwGetMouseButton(window, 0) && (!mousePressed))
 	{

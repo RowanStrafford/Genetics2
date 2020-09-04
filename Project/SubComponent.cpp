@@ -4,7 +4,7 @@
 
 SubComponent::SubComponent()
 {
-	m_cube = new Cube(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), glm::vec3(1, 0, 0));
+	m_cube = new Cube();
 }
 
 SubComponent::~SubComponent()

@@ -15,6 +15,11 @@ GA::~GA()
 void GA::SetInputModel(Component* component)
 {
 	m_inputModel = component;
+
+	m_inputModel->SetPosition(glm::vec3(0, 0, 0));
+	m_inputModel->Update(0);
+	m_inputModel->GetSubComponent(0)->SetColour(glm::vec3(1, 1, 1));
+	m_inputModel->GetSubComponent(1)->SetColour(glm::vec3(1, 1, 1));
 }
 
 void GA::SetInputModel(SubComponent* model)
@@ -31,11 +36,24 @@ void GA::GenerateInitialPopulation(int populationSize)
 	for (unsigned int i = 0; i < m_populationSize; i++)
 	{
 		glm::vec3 newColour;
-		newColour.r = (rand() % 100) / 100.0f;
-		newColour.g = (rand() % 100) / 100.0f;
-		newColour.b = (rand() % 100) / 100.0f;
+		newColour.r = 1.0f;
+		newColour.g = 1.0f;
+		newColour.b = 1.0f;
 
-		SubComponent* newSC1 = new SubComponent();
+		Component* newComp = new Component(i + 1);
+
+		for (unsigned int i = 0; i < m_inputModel->GetSubComponentSize(); i++)
+		{
+			SubComponent* newSC = new SubComponent();
+			newSC->CopyData(m_inputModel->GetSubComponent(i));
+			newSC->SetTexture("Images/Brick2.png");
+			newSC->Mutate();
+			newSC->SetColour(newColour);
+
+			newComp->AddComponent(newSC);
+		}
+
+		/*SubComponent* newSC1 = new SubComponent();
 		newSC1->CopyData(m_inputModel->GetSubComponent(0));
 		newSC1->SetTexture("Images/Brick2.png");
 		newSC1->Mutate();
@@ -49,14 +67,20 @@ void GA::GenerateInitialPopulation(int populationSize)
 
 		Component* comp = new Component(i + 1);
 		comp->AddComponent(newSC1);
-		comp->AddComponent(newSC2);
-		comp->SetPosition(glm::vec3(i * 5, 0, 0));
+		comp->AddComponent(newSC2);*/
 
-		m_vPopulation.push_back(comp);
+		newComp->SetPosition(glm::vec3(i * 5, 0, 0));
+
+		m_vPopulation.push_back(newComp);
 		//m_vPopulation.push_back(newSC);
 	}
 
 	UpdatePopulation();
+}
+
+void GA::DisplayInputModel(Shader* shader, Camera* cam)
+{		
+	m_inputModel->Draw(shader);
 }
 
 void GA::DisplayPopulation(Shader* shader, Camera* cam)
@@ -168,6 +192,9 @@ void GA::Mutation()
 
 void GA::IncrimentDisplay(Camera* cam)
 {
+	std::cout << "Model " << m_displayIndex << std::endl;
+	std::cout << "Score : " << m_vPopulation[m_displayIndex]->GetScore() << std::endl << std::endl;
+
 	m_displayIndex++;
 
 	if (m_displayIndex >= m_vPopulation.size())
@@ -181,7 +208,7 @@ void GA::IncrimentDisplay(Camera* cam)
 	newPos.z += 1.5f;
 	newPos.y += 0.5f;
 
-	cam->SetPosition(newPos);
+	cam->SetPosition(newPos);	
 }
 
 void GA::RotateCurrentModel(glm::vec3 dir, float delta)

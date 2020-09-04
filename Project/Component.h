@@ -21,6 +21,8 @@ public:
 	
 	void ApplyPosition();
 
+	int GetSubComponentSize() { return m_vSubComponents.size(); }
+
 private:
 	std::vector<SubComponent*> m_vSubComponents;
 	unsigned int m_index;	// 0 for input, 1+ for indexes
