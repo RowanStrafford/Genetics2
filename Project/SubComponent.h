@@ -1,12 +1,16 @@
 #pragma once
 #include "Cube.h"
 #include "MyCylinder.h"
+#include "OBJ.h"
 
 class SubComponent
 {
 public:
 	SubComponent();
+	SubComponent(Geometry* object);
 	~SubComponent();
+
+	void SetOBJ(OBJ * obj);
 
 	void SetColour(glm::vec3 colour);
 	void SetColour();
@@ -24,11 +28,19 @@ public:
 	void AxisScale();
 	void CopyData(SubComponent * sc);
 
+	void Connect(SubComponent * sc);
+
 
 	Cube* GetCube() { return m_cube; }
+	Geometry* GetGeometry() { return m_geometry; }
 
+	int m_index;
+	OBJ* m_OBJ;
 private:
 	Cube* m_cube;
+	Geometry* m_geometry;
+
+	
 
 	glm::vec3 m_localPos;
 	glm::vec3 m_colour;

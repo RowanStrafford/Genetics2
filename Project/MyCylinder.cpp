@@ -26,11 +26,6 @@ MyCylinder::~MyCylinder()
 
 }
 
-void MyCylinder::CreateVertices()
-{
-
-}
-
 void MyCylinder::SetupGL()
 {
 	glEnable(GL_DEPTH_TEST);
@@ -369,6 +364,11 @@ float MyCylinder::Round(float val)
 {
 	if (val < 0) return ceil(val - 0.5f);
 	else return floor(val + 0.5f);
+}
+
+void MyCylinder::CopyData(MyCylinder* cylinder)
+{
+
 }
 
 

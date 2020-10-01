@@ -1,4 +1,4 @@
-﻿  Application.cpp
+﻿  GA.cpp
 c:\users\rowan\documents\genetics2\genetics2\project\camera.h(125): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
           with
           [
@@ -14,37 +14,10 @@ c:\users\rowan\documents\genetics2\genetics2\project\camera.h(127): warning C424
           [
               T=float
           ]
-c:\users\rowan\documents\genetics2\genetics2\project\application.cpp(242): warning C4018: '<': signed/unsigned mismatch
-c:\users\rowan\documents\genetics2\genetics2\project\application.cpp(304): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\rowan\documents\genetics2\genetics2\project\application.cpp(512): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\rowan\documents\genetics2\genetics2\project\application.cpp(514): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\rowan\documents\genetics2\genetics2\project\application.cpp(516): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\rowan\documents\genetics2\genetics2\project\application.cpp(518): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\rowan\documents\genetics2\genetics2\project\application.cpp(578): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-  Component.cpp
-  GA.cpp
-c:\users\rowan\documents\genetics2\genetics2\project\camera.h(125): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\rowan\documents\genetics2\genetics2\project\camera.h(126): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\rowan\documents\genetics2\genetics2\project\camera.h(127): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(32): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(32): warning C4018: '<': signed/unsigned mismatch
 c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(36): warning C4018: '<': signed/unsigned mismatch
-c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(45): warning C4018: '<': signed/unsigned mismatch
-c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(88): warning C4018: '<': signed/unsigned mismatch
-c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(97): warning C4018: '<': signed/unsigned mismatch
-c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(108): warning C4018: '<': signed/unsigned mismatch
-c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(112): warning C4018: '<': signed/unsigned mismatch
-c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(200): warning C4018: '>=': signed/unsigned mismatch
-  Generating Code...
+c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(96): warning C4018: '<': signed/unsigned mismatch
+c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(107): warning C4018: '<': signed/unsigned mismatch
+c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(111): warning C4018: '<': signed/unsigned mismatch
+c:\users\rowan\documents\genetics2\genetics2\project\ga.cpp(216): warning C4018: '>=': signed/unsigned mismatch
   Project.vcxproj -> C:\Users\rowan\Documents\Genetics2\Genetics2\Debug\Project.exe

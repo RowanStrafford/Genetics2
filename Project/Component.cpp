@@ -11,6 +11,7 @@ Component::Component(int index)
 
 Component::~Component()
 {
+	//m_vSubComponents[0]->CopyData()
 }
 
 void Component::AddComponent(SubComponent* sc)
@@ -26,17 +27,11 @@ void Component::Draw(Shader* shader)
 	}
 }
 
-void Component::Update(int index)
+void Component::Update()
 {
 	for (unsigned int i = 0; i < m_vSubComponents.size(); i++)
 	{
-		//glm::vec3 newPos = m_vSubComponents[i]->GetCube()->GetPosition();
-		//newPos.x += (index * 5);
-
-		//m_vSubComponents[i]->GetCube()->SetPosition(newPos);
-
-		m_vSubComponents[i]->SetGlobalPosition(m_pos);
-		m_vSubComponents[i]->GetCube()->Update();
+		m_vSubComponents[i]->m_OBJ->Update();
 	}
 }
 
@@ -47,6 +42,6 @@ SubComponent* Component::GetSubComponent(int index)
 
 void Component::ApplyPosition()
 {
-	//m_vSubComponents[0].s
+
 }
 

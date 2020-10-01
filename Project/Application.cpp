@@ -8,6 +8,7 @@
 #include "MyCylinder.h"
 #include "SubComponent.h"
 #include "Component.h"
+#include "OBJ.h"
 
 // GLM - MATHS/VECTORS/MATRICES
 #include <glm/glm.hpp>
@@ -16,6 +17,7 @@
 
 //#include <Windows.h>
 #include <iostream>
+#include <time.h>  
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -23,15 +25,12 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void ProcessInput(GLFWwindow* window);
 
 void Setup(GLFWwindow* window);
-void DrawCubes(std::vector<Cube*> cubes, Shader* shader, GLFWwindow* window);
-void DrawCube(Cube* cube, Shader* shader, GLFWwindow* window);
-void DrawCylinder(MyCylinder* cylinder, Shader* shader, GLFWwindow* window);
-void Draw(MyCylinder* cylinder, Cube* cube, Shader* shader, GLFWwindow* window);
 void LoadFile();
 void DrawGA(GA* ga, Shader* shader, GLFWwindow* window);
 void DrawGAInputModel(GA* ga, Shader* shader, GLFWwindow* window);
+void DrawOBJModels(std::vector<OBJ*> models, Shader* shader, GLFWwindow* window);
 
-Camera* cam = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera* cam = new Camera(glm::vec3(0.0f, 3.0f, 15.0f));
 const unsigned int SCR_WIDTH = 1500;
 const unsigned int SCR_HEIGHT = 1000;
 double lastX = SCR_WIDTH / 2.0f;
@@ -49,12 +48,10 @@ int displayIndex = 0;
 bool mousePressed = false;
 bool simulationBegin = false;
 
+int displayNum = 0;
+
 int main()
 {
-	//System* s = new System();
-	//s->SetCallbackFunctions();
-	//s->Update();	
-
 	// Initialisation of GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -87,48 +84,53 @@ int main()
 	Shader* shader2 = new Shader("Shaders/Cylinder.vert", "Shaders/Cylinder.frag");
 	Shader* shaderMix = new Shader("Shaders/Mix.vert", "Shaders/Mix.frag");
 	Shader* colorShader = new Shader("Shaders/Color.vert", "Shaders/Color.frag");
+	
+	srand(time(NULL));
 
-	/*Cube* newCube = new Cube();
-	newCube->SetPosition(glm::vec3(0, 0, 0));
-	newCube->SetScale(glm::vec3(1, 1, 1));
-	newCube->SetRotation(glm::vec3(1, 0, 0));
-	newCube->LoadTexture("Images/Brick2.png");
-	newCube->UpdateModel();
+	OBJ* base = new OBJ();
+	base->LoadOBJ("Models/Lamp2/Base.obj");
+	base->GenerateBuffers();
+	base->SetTransforms(glm::vec3(0, 0, 0), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1, 0, 0));
 
-	DrawCube(newCube, shader1, window);
-	*/
+	OBJ* pole = new OBJ();
+	pole->LoadOBJ("Models/Lamp2/Pole.obj");
+	pole->GenerateBuffers();
+	pole->SetTransforms(glm::vec3(0, 0, 0), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1, 0, 0));
+
+	OBJ* shade = new OBJ();
+	shade->LoadOBJ("Models/Lamp2/Shade.obj");
+	shade->GenerateBuffers();
+	shade->SetTransforms(glm::vec3(0, 10, 0), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1, 0, 0));	
+	shade->CalculateBoundingBox();
+	//base->Update();
+	//pole->Update();
+	//shade->Update();	
 
 	SubComponent* sc1 = new SubComponent();
-	sc1->Set(glm::vec3(0, 0, 0), glm::vec3(0.4f, 0.05f, 0.4f), glm::vec3(1, 0, 0));		
-	sc1->SetTexture("Images/Brick2.png");
+	sc1->SetOBJ(base);
+	sc1->SetColour();
 
-	//sc1->SetTexture(shader)
 	SubComponent* sc2 = new SubComponent();
-	sc2->Set(glm::vec3(0, 0.2f, 0), glm::vec3(0.05f, 0.4f, 0.05f), glm::vec3(1, 0, 0));
-	sc2->SetTexture("Images/Brick2.png");
+	sc2->SetOBJ(pole);
+	sc2->SetColour();
 
 	SubComponent* sc3 = new SubComponent();
-	sc3->set
+	sc3->SetOBJ(shade);
+	sc3->SetColour();
+
+	sc2->Connect(sc1);
+	sc2->m_OBJ->CalculateBoundingBox();
+	sc3->Connect(sc2);
+
 	Component* inputComponent = new Component(0);
 	inputComponent->AddComponent(sc1);
 	inputComponent->AddComponent(sc2);
+	inputComponent->AddComponent(sc3);
+	inputComponent->Update();
 
 	ga->SetInputModel(inputComponent);
 	DrawGAInputModel(ga, shader1, window);
-	ga->GenerateInitialPopulation(5);
-	
-
-	//std::vector<Cube*> cubes;
-
-	//MyCylinder* c = new MyCylinder(0.5f, 1.0f, 2.0f, 10);
-//	c->LoadTexture("Images/Brick2.png");
-	//cube1 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	//cube1->LoadTexture(shader1);	
-
-	//DrawCubes(cubes, shader1, window);
-	//DrawCylinder(c, shader2, window);
-	//DrawCube(cube1, shader1, window);
-	//Setup(window);
+	ga->GenerateInitialPopulation(5);	
 
 	DrawGA(ga, shader1, window);
 
@@ -142,7 +144,7 @@ void DrawGAInputModel(GA* ga, Shader* shader, GLFWwindow* window)
 	{
 		if (simulationBegin) return;
 
-		glClearColor(0.78f, 0.78f, 0.78f, 1.0f);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		double currentFrame = glfwGetTime();
@@ -187,131 +189,12 @@ void DrawGA(GA* ga, Shader* shader, GLFWwindow* window)
 		glm::mat4 view = cam->GetViewMatrix();
 		shader->SetMatrix("view", view);
 
-		ga->DisplayPopulation(shader, cam);
+		ga->DisplayPopulation(shader, cam, displayNum);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 }
-
-void Draw(MyCylinder* cylinder, Cube* cube, Shader* shader, GLFWwindow* window)
-{
-	while (!glfwWindowShouldClose(window))
-	{
-		glClearColor(0.78f, 0.78f, 0.78f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		double currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
-		ProcessInput(window);
-
-		shader->Use();
-
-		glm::mat4 projection = glm::perspective(glm::radians(cam->m_zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		shader->SetMatrix("projection", projection);
-
-		glm::mat4 view = cam->GetViewMatrix();
-		shader->SetMatrix("view", view);
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-}
-
-void DrawCubes(std::vector<Cube*> cubes, Shader* shader, GLFWwindow* window)
-{
-	while (!glfwWindowShouldClose(window))
-	{
-		glClearColor(0.78f, 0.78f, 0.78f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		double currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
-		ProcessInput(window);
-
-		shader->Use();
-
-		glm::mat4 projection = glm::perspective(glm::radians(cam->m_zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		shader->SetMatrix("projection", projection);
-
-		glm::mat4 view = cam->GetViewMatrix();
-		shader->SetMatrix("view", view);
-
-		for (int i = 0; i < cubes.size(); i++)
-		{
-			cubes[i]->Draw(shader);
-		}
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-}
-
-void DrawCube(Cube* cube, Shader* shader, GLFWwindow* window)
-{
-	while (!glfwWindowShouldClose(window))
-	{
-		glClearColor(0.78f, 0.78f, 0.78f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		double currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
-		ProcessInput(window);
-
-		shader->Use();
-
-		glm::mat4 projection = glm::perspective(glm::radians(cam->m_zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		shader->SetMatrix("projection", projection);
-
-		glm::mat4 view = cam->GetViewMatrix();
-		shader->SetMatrix("view", view);
-
-		//cube->Update(deltaTime);
-		cube->Draw(shader);
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-}
-
-void DrawCylinder(MyCylinder* cylinder, Shader* shader, GLFWwindow* window)
-{
-	while (!glfwWindowShouldClose(window))
-	{
-		//glViewport(SCR_WIDTH / 3, 0, (SCR_WIDTH / 3) * 2, SCR_HEIGHT);
-
-		glClearColor(0.78f, 0.78f, 0.78f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		double currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
-		ProcessInput(window);
-
-		shader->Use();
-
-		glm::mat4 projection = glm::perspective(glm::radians(cam->m_zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		shader->SetMatrix("projection", projection);
-
-		glm::mat4 view = cam->GetViewMatrix();
-		shader->SetMatrix("view", view);
-
-		cylinder->Update(deltaTime);
-		cylinder->Draw(shader);
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-}
-
-
 
 std::string ReadFile(const char *filePath) {
 	std::string content;
@@ -505,6 +388,31 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void ProcessInput(GLFWwindow* window)
 {
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	{
+		displayNum = 0;
+	} 
+
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	{
+		displayNum = 1;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	{
+		displayNum = 2;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	{
+		displayNum = 3;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+	{
+		displayNum = 4;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
@@ -544,15 +452,7 @@ void ProcessInput(GLFWwindow* window)
 		ga->IncrimentDisplay(cam);
 	}
 
-	if (!glfwGetMouseButton(window, 0))
-	{
-		mousePressed = false;
-	}
-
-	
-
-
-
+	if (!glfwGetMouseButton(window, 0)) mousePressed = false;	
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -574,8 +474,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-	// Here i will set the scores of the models
-	//cam->ProcessMouseScroll(yoffset);
+{	
 	ga->AddScore(yoffset);
 }

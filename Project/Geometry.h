@@ -25,7 +25,7 @@ public:
 
 	virtual void UpdateModel();
 	virtual void CreateVertices();
-
+	virtual void CopyData(Geometry* geometry);
 protected:
 	GLuint VBO, VAO;
 

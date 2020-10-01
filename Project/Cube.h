@@ -19,6 +19,8 @@ public:
 	void Rotate(float deltaTime);
 
 	void Translate(float deltaTime);
+
+	void CopyData(Cube* cube);
 	
 	virtual void CreateVertices();
 

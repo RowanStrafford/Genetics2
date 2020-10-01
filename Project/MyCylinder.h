@@ -10,7 +10,6 @@ public:
 	MyCylinder(float baseRadius, float topRadius, float height, int edges);
 	~MyCylinder();
 
-	virtual void CreateVertices();
 	virtual void Draw(Shader* shader);
 
 	virtual void SetupGL();
@@ -44,6 +43,8 @@ public:
 	void AddIndices(unsigned int index1, unsigned int index2, unsigned int index3);
 
 	float Round(float val);
+
+	void CopyData(MyCylinder * cylinder);
 
 private:
 	float m_height;

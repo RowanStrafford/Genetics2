@@ -53,3 +53,8 @@ void Geometry::CreateVertices()
 	// Create vertices in here
 }
 
+void Geometry::CopyData(Geometry * geometry)
+{
+}
+
+

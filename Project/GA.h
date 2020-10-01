@@ -16,7 +16,7 @@ public:
 	void SetInputModel(SubComponent * model);
 	void GenerateInitialPopulation(int populationSize);
 	void DisplayInputModel(Shader * shader, Camera * cam);
-	void DisplayPopulation(Shader* shader, Camera* cam);
+	void DisplayPopulation(Shader* shader, Camera* cam, int num);
 	void UpdatePopulation();
 	void Selection();
 	// Selection of population

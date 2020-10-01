@@ -72,6 +72,11 @@ void Cube::Translate(float deltaTime)
 	m_model = glm::translate(m_model, m_position);
 }
 
+void Cube::CopyData(Cube* cube)
+{
+
+}
+
 void Cube::CreateVertices()
 {
 	m_vVertices = 

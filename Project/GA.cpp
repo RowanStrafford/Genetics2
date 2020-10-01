@@ -1,7 +1,6 @@
 #include "GA.h"
 
 #include <stdlib.h>     
-#include <time.h>  
 
 GA::GA()
 {
@@ -16,10 +15,9 @@ void GA::SetInputModel(Component* component)
 {
 	m_inputModel = component;
 
-	m_inputModel->SetPosition(glm::vec3(0, 0, 0));
-	m_inputModel->Update(0);
-	m_inputModel->GetSubComponent(0)->SetColour(glm::vec3(1, 1, 1));
-	m_inputModel->GetSubComponent(1)->SetColour(glm::vec3(1, 1, 1));
+	m_inputModel->SetGlobalPosition(glm::vec3(0, 0, 0));
+
+	//m_inputModel->GetSubComponent(2)->Connect(m_inputModel->GetSubComponent(1));
 }
 
 void GA::SetInputModel(SubComponent* model)
@@ -29,29 +27,30 @@ void GA::SetInputModel(SubComponent* model)
 
 void GA::GenerateInitialPopulation(int populationSize)
 {
-	srand(time(NULL));
-
 	m_populationSize = populationSize;
 
 	for (unsigned int i = 0; i < m_populationSize; i++)
 	{
-		glm::vec3 newColour;
-		newColour.r = 1.0f;
-		newColour.g = 1.0f;
-		newColour.b = 1.0f;
-
 		Component* newComp = new Component(i + 1);
 
 		for (unsigned int i = 0; i < m_inputModel->GetSubComponentSize(); i++)
 		{
 			SubComponent* newSC = new SubComponent();
 			newSC->CopyData(m_inputModel->GetSubComponent(i));
-			newSC->SetTexture("Images/Brick2.png");
+			//newSC->SetGlobalPosition(newComp->GetGlobalPosition());
 			newSC->Mutate();
-			newSC->SetColour(newColour);
 
 			newComp->AddComponent(newSC);
 		}
+
+		newComp->GetSubComponent(2)->m_OBJ->CalculateBoundingBox();
+		newComp->GetSubComponent(1)->Connect(newComp->GetSubComponent(0));
+		newComp->GetSubComponent(1)->m_OBJ->CalculateBoundingBox();
+		newComp->GetSubComponent(2)->Connect(newComp->GetSubComponent(1));
+		
+
+		//newComp->SetGlobalPosition(glm::vec3(i * 5, 0, 0));
+		//newSC->SetGlobalPosition(newComp->GetGlobalPosition());
 
 		/*SubComponent* newSC1 = new SubComponent();
 		newSC1->CopyData(m_inputModel->GetSubComponent(0));
@@ -69,7 +68,6 @@ void GA::GenerateInitialPopulation(int populationSize)
 		comp->AddComponent(newSC1);
 		comp->AddComponent(newSC2);*/
 
-		newComp->SetPosition(glm::vec3(i * 5, 0, 0));
 
 		m_vPopulation.push_back(newComp);
 		//m_vPopulation.push_back(newSC);
@@ -83,13 +81,14 @@ void GA::DisplayInputModel(Shader* shader, Camera* cam)
 	m_inputModel->Draw(shader);
 }
 
-void GA::DisplayPopulation(Shader* shader, Camera* cam)
+void GA::DisplayPopulation(Shader* shader, Camera* cam, int num)
 {
-	for (unsigned int i = 0; i < m_populationSize; i++)
-	{
-		//m_vPopulation[i]->GetCube()->Draw(shader);
-		m_vPopulation[i]->Draw(shader);
-	}
+	m_vPopulation[num]->Draw(shader);
+
+	//for (unsigned int i = 0; i < m_populationSize; i++)
+	//{
+	//	m_vPopulation[i]->Draw(shader);
+	//}
 }
 
 void GA::UpdatePopulation()
@@ -97,7 +96,7 @@ void GA::UpdatePopulation()
 	for (unsigned int i = 0; i < m_populationSize; i++)
 	{
 		//m_vPopulation[i]->GetCube()->Update();
-		m_vPopulation[i]->Update(i);
+		m_vPopulation[i]->Update();
 	}
 }
 
@@ -167,16 +166,33 @@ Component* GA::Crossover(int index1, int index2, int arrIndex)
 
 	SubComponent* sc1 = new SubComponent();
 	SubComponent* sc2 = new SubComponent();
+	SubComponent* sc3 = new SubComponent();
 
-	sc1->CopyData(m_vPopulation[index1]->GetSubComponent(0));
-	sc2->CopyData(m_vPopulation[index2]->GetSubComponent(1));
+	//sc1->CopyData(m_vPopulation[index1]->GetSubComponent(0));
+	//sc2->CopyData(m_vPopulation[index2]->GetSubComponent(1));
+	//sc3->CopyData(m_vPopulation[index2]->GetSubComponent(2));
 
-	sc1->SetTexture("Images/Brick2.png");
-	sc2->SetTexture("Images/Brick2.png");
+	int randNum1 = rand() % 10;
+	int randNum2 = rand() % 10;
+	int randNum3 = rand() % 10;
+
+	if(randNum1 % 2 == 0)	sc1->CopyData(m_vPopulation[index1]->GetSubComponent(0));
+	else					sc1->CopyData(m_vPopulation[index2]->GetSubComponent(0));
+
+	if (randNum2 % 2 == 0)	sc2->CopyData(m_vPopulation[index1]->GetSubComponent(1));
+	else					sc2->CopyData(m_vPopulation[index2]->GetSubComponent(1));
+
+	if (randNum3 % 2 == 0)	sc3->CopyData(m_vPopulation[index1]->GetSubComponent(2));
+	else					sc3->CopyData(m_vPopulation[index2]->GetSubComponent(2));
 
 	newComp->AddComponent(sc1);
 	newComp->AddComponent(sc2);
-	newComp->SetPosition(glm::vec3(arrIndex * 5, 0, 0));
+	newComp->AddComponent(sc3);
+
+	//newComp->GetSubComponent(2)->m_OBJ->CalculateBoundingBox();
+	//newComp->GetSubComponent(1)->Connect(newComp->GetSubComponent(0));
+	//newComp->GetSubComponent(1)->m_OBJ->CalculateBoundingBox();
+	//newComp->GetSubComponent(2)->Connect(newComp->GetSubComponent(1));
 
 	std::cout << "New child created!" << std::endl;
 	std::cout << "Parent : " << index1 << std::endl;
@@ -204,11 +220,11 @@ void GA::IncrimentDisplay(Camera* cam)
 	}
 
 
-	glm::vec3 newPos = m_vPopulation[m_displayIndex]->GetSubComponent(0)->GetCube()->GetPosition();
-	newPos.z += 1.5f;
-	newPos.y += 0.5f;
+	//glm::vec3 newPos = m_vPopulation[m_displayIndex]->GetSubComponent(0)->GetCube()->GetPosition();
+	//newPos.z += 1.5f;
+	//newPos.y += 0.5f;
 
-	cam->SetPosition(newPos);	
+	//cam->SetPosition(newPos);	
 }
 
 void GA::RotateCurrentModel(glm::vec3 dir, float delta)
